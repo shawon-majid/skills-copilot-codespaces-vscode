@@ -1,22 +1,24 @@
-// create a web server
+// Create web server
+// Run: node comments.js
+// Access: http://localhost:8080
 
-// 1. require http module
-const http = require('http');
+var http = require('http');
+var fs = require('fs');
 
-// 2. create a server object
-// req: request
-// res: response
-const server = http.createServer((req, res) => {
-  // 3. handle request
-  // set status code
-  res.statusCode = 200;
-  // set header
-  res.setHeader('Content-Type', 'text/plain');
-  // send response
-  res.end('Hello World\n');
-});
-
-// 4. start the server
-server.listen(3000, () => {
-  console.log('Server running at http://localhost:3000/');
+var server = http.createServer(function(req, res) {
+    console.log('Request was made: ' + req.url);
+    if (req.url === '/home' || req.url === '/') {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        fs.createReadStream(__dirname + '/index.html').pipe(res);
+    } else if (req.url === '/contact') {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        fs.createReadStream(__dirname + '/contact.html').pipe(res);
+    } else if (req.url === '/api/ninjas') {
+        var ninjas = [{name: 'ryu', age: 29}, {name: 'yoshi', age: 32}];
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(ninjas));
+    } else {
+        res.writeHead(404, {'Content-Type': 'text/html'});
+        fs.createReadStream(__dirname + '/404.html').pipe(res);
+    }
 });
